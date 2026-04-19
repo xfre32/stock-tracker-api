@@ -24,11 +24,12 @@ spring:
 
   jackson:
     default-property-inclusion: non_null
+  web:
+    error:
+      include-message: always
 
 server:
   port: 8080
-  error:
-    include-message: always
 
 # ===== Custom properties =====
 app:
