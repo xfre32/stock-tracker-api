@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update     # Auto-create tables in dev
+    show-sql: true
+
+  devtools:
+    restart:
+      enabled: true
+
+logging:
+  level:
+    com.xfre32.stocktracker: DEBUG
+    org.springframework.web: DEBUG
