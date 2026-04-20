@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-class FinnhubService {
+public class FinnhubService {
     private final WebClient finnhubWebClient;
 
     @Cacheable(value = "search", key = "#query")
