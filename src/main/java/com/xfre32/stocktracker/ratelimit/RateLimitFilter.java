@@ -1,27 +1,33 @@
 package com.xfre32.stocktracker.ratelimit;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xfre32.stocktracker.config.AppProperties;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@RequiredArgsConstructor
 @Order(1) // Ensure this filter runs before other filters
 class RateLimitFilter implements Filter {
     private final AppProperties props;
-    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final Cache<String, Bucket> buckets;
+
+    RateLimitFilter(AppProperties props) {
+        this.props = props;
+        this.buckets = Caffeine.newBuilder()
+                .maximumSize(props.rateLimit().maxBuckets())
+                .expireAfterAccess(Duration.ofSeconds(props.rateLimit().bucketTtlSeconds()))
+                .build();
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -35,8 +41,8 @@ class RateLimitFilter implements Filter {
             return;
         }
 
-        String clientIp = getClientIp(httpRequest);
-        Bucket bucket = buckets.computeIfAbsent(clientIp, k -> createBucket());
+        String clientIp = httpRequest.getRemoteAddr();
+        Bucket bucket = buckets.asMap().computeIfAbsent(clientIp, k -> createBucket());
 
         if (bucket.tryConsume(1)) {
             chain.doFilter(request, response);
@@ -58,13 +64,6 @@ class RateLimitFilter implements Filter {
                                     Duration.ofSeconds(props.rateLimit().refillDuration()))
                         .build())
                 .build();
-    }
-
-    private String getClientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        return (forwarded != null && !forwarded.isEmpty())
-                ? forwarded.split(",")[0].trim()
-                : request.getRemoteAddr();
     }
 
 }
