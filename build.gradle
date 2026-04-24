@@ -45,7 +45,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'  // H2 for dev profile (in-memory DB)
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-h2console'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     //    testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
