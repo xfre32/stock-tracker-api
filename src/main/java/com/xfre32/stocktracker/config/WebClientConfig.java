@@ -1,5 +1,6 @@
 package com.xfre32.stocktracker.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -17,6 +18,12 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class WebClientConfig {
     private final AppProperties props;
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .findAndRegisterModules();
+    }
 
     @Bean
     public WebClient finnhubWebClient() {
