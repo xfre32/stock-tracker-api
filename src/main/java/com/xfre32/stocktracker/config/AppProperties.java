@@ -9,11 +9,13 @@ public record AppProperties(
         TwelveData twelveData,
         Jwt jwt,
         Cors cors,
-        RateLimit rateLimit
+        RateLimit rateLimit,
+        ExternalApi externalApi
 ) {
     public record Finnhub(String apiKey, String baseUrl, String wsUrl) {}
     public record TwelveData(String apiKey, String baseUrl) {}
     public record Jwt(String secret, long accessTokenExpiration, long refreshTokenExpiration) {}
     public record Cors(List<String> allowedOrigins) {}
-    public record RateLimit(int capacity, int refillTokens, int refillDuration) {}
+    public record RateLimit(int capacity, int refillTokens, int refillDuration, long bucketTtlSeconds, long maxBuckets) {}
+    public record ExternalApi(int connectTimeoutMs, int readTimeoutMs, int writeTimeoutMs, int responseTimeoutMs) {}
 }
